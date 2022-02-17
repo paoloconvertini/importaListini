@@ -12,6 +12,15 @@ public class Configuration {
     @Value("${output_dir}")
     private String outputDir;
 
+    @Value("${codice}")
+    private String codice;
+
+    @Value("${descrizione}")
+    private String descrizione;
+
+    @Value("${prezzi}")
+    private String prezzi;
+
     public String getInputDir() {
         return inputDir;
     }
@@ -28,4 +37,27 @@ public class Configuration {
         this.outputDir = outputDir;
     }
 
+    public String getCodice() {
+        return codice;
+    }
+
+    public void setCodice(String codice) {
+        this.codice = codice;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
+    public String getPrezzi() {
+        return prezzi;
+    }
+
+    public void setPrezzi(String prezzi) {
+        this.prezzi = prezzi;
+    }
 }

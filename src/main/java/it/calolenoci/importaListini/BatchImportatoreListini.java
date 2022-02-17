@@ -1,7 +1,10 @@
 package it.calolenoci.importaListini;
 
+import it.calolenoci.importaListini.helper.ReaderHelper;
 import it.calolenoci.importaListini.model.Configuration;
 import it.calolenoci.importaListini.reader.FileReader;
+import it.calolenoci.importaListini.reader.TxtReader;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +16,12 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Classe che si occupa di verificare le cartelle di alimentazione del processo
@@ -26,9 +35,10 @@ public class BatchImportatoreListini {
     private static final Logger log = LogManager.getLogger(BatchImportatoreListini.class);
 
     @Resource
-    private
-    Configuration configuration;
+    private Configuration configuration;
 
+    @Resource
+    ReaderHelper readerHelper;
 
     public void execute() {
 
@@ -37,6 +47,11 @@ public class BatchImportatoreListini {
         try {
             log.debug("Inizio importazione");
             String inputDir = configuration.getInputDir();
+            File folder = new File(inputDir);
+            File[] files = folder.listFiles();
+            if(files != null){
+                readerHelper.read(files);
+            }
             log.debug("inputdir: " + inputDir);
         } catch (Exception e) {
             log.error("Errore importazione ", e);
