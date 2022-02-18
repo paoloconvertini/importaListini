@@ -4,15 +4,14 @@ import com.aspose.cells.*;
 import it.calolenoci.importaListini.model.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellCopyPolicy;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -56,7 +55,7 @@ public class ExcelReader implements FileReader {
         org.apache.poi.ss.usermodel.Row headerRow = sheetCopyFrom.getRow(0);
         int firstRow = sheetCopyFrom.getFirstRowNum();
         int lastRow = sheetCopyFrom.getLastRowNum();
-        List<Integer> colIndexList = new ArrayList<>();
+        //List<Integer> colIndexList = new ArrayList<>();
         Map<Integer, String> columnMap = new HashMap<>();
         //filtro la lista per recuperare solo i valori da riportare nel file definitivo
         int columnIndex;
@@ -68,10 +67,10 @@ public class ExcelReader implements FileReader {
                 if (configuration.getCodice().equals(cell.getStringCellValue()) ||
                         configuration.getDescrizione().equals(cell.getStringCellValue()) ||
                         configuration.getPrezzi().equals(cell.getStringCellValue())) {
-                    columnMap.put(cell.getColumnIndex(), cell.getStringCellValue());
                     columnIndex = cell.getColumnIndex();
+                    columnMap.put(columnIndex, cell.getStringCellValue());
                     log.debug("codice col index=" + columnIndex);
-                    colIndexList.add(columnIndex);
+                    //colIndexList.add(columnIndex);
                 }
             }
         }
@@ -85,7 +84,7 @@ public class ExcelReader implements FileReader {
             for (Integer integer : columnMap.keySet()) {
                 org.apache.poi.ss.usermodel.Cell cellCopyTo = rowCopyTo.createCell(counter);
                 org.apache.poi.ss.usermodel.Cell cellCopyFrom = rowCopyFrom.getCell(integer, org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                setCellValue(cellCopyFrom, cellCopyTo, columnMap.get(integer));
+                setCellValue(wbCopyTo, cellCopyFrom, cellCopyTo, columnMap.get(integer));
                 counter++;
             }
         }
@@ -131,7 +130,7 @@ public class ExcelReader implements FileReader {
         workbook.close();
     }*/
 
-    private void setCellValue(org.apache.poi.ss.usermodel.Cell cell, org.apache.poi.ss.usermodel.Cell cellCopyTo, String colName) {
+    private void setCellValue(XSSFWorkbook wbCopyTo, org.apache.poi.ss.usermodel.Cell cell, org.apache.poi.ss.usermodel.Cell cellCopyTo, String colName) {
         CellType cellType = cell.getCellType().equals(CellType.FORMULA)
                 ? cell.getCachedFormulaResultType() : cell.getCellType();
         if (cellType.equals(CellType.STRING)) {
@@ -141,7 +140,10 @@ public class ExcelReader implements FileReader {
             if (DateUtil.isCellDateFormatted(cell)) {
                 cellCopyTo.setCellValue(cell.getDateCellValue());
             } else if (configuration.getPrezzi().equals(colName)){
-                //TODO format currency
+                XSSFCellStyle styleCurrencyFormat = wbCopyTo.createCellStyle();
+                styleCurrencyFormat.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
+                cellCopyTo.setCellValue(cell.getNumericCellValue());
+                cellCopyTo.setCellStyle(styleCurrencyFormat);
             }
             else {
                 cellCopyTo.setCellValue(cell.getNumericCellValue());
