@@ -21,6 +21,9 @@ public class Configuration {
     @Value("${prezzi}")
     private String prezzi;
 
+    @Value("${csvSeparator}")
+    private String csvSeparator;
+
     public String getInputDir() {
         return inputDir;
     }
@@ -59,5 +62,13 @@ public class Configuration {
 
     public void setPrezzi(String prezzi) {
         this.prezzi = prezzi;
+    }
+
+    public String getCsvSeparator() {
+        return csvSeparator;
+    }
+
+    public void setCsvSeparator(String csvSeparator) {
+        this.csvSeparator = csvSeparator;
     }
 }

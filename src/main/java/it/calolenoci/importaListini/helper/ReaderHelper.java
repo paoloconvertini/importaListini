@@ -1,7 +1,8 @@
 package it.calolenoci.importaListini.helper;
 
+import it.calolenoci.importaListini.constant.ConstantString;
 import it.calolenoci.importaListini.reader.CsvReader;
-import it.calolenoci.importaListini.reader.FileReader;
+import it.calolenoci.importaListini.reader.IFileReader;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 
@@ -15,15 +16,16 @@ import java.util.stream.Collectors;
 public class ReaderHelper {
 
     @Resource
-    FileReader excelReader;
+    IFileReader excelReader;
+
+    @Resource
+    IFileReader csvReader;
 
     public void read(File[]  files){
-        List<File> txtFiles = Arrays.stream(files).filter(f -> "txt".equals(FilenameUtils.getExtension(f.getPath()))).collect(Collectors.toList());
-        List<File> csvFiles = Arrays.stream(files).filter(f -> "csv".equals(FilenameUtils.getExtension(f.getPath()))).collect(Collectors.toList());
-        List<File> excelFiles = Arrays.stream(files).filter(f -> "xlsx".equals(FilenameUtils.getExtension(f.getPath()))).collect(Collectors.toList());
-        //txtReader = new TxtReader();
+        List<File> txtFiles = Arrays.stream(files).filter(f -> ConstantString.TXT.equals(FilenameUtils.getExtension(f.getPath()))).collect(Collectors.toList());
+        List<File> csvFiles = Arrays.stream(files).filter(f -> ConstantString.CSV.equals(FilenameUtils.getExtension(f.getPath()))).collect(Collectors.toList());
+        List<File> excelFiles = Arrays.stream(files).filter(f -> FilenameUtils.getExtension(f.getPath()).startsWith(ConstantString.XLS)).collect(Collectors.toList());
         //txtReader.read(txtFiles);
-        FileReader csvReader = new CsvReader();
         csvReader.read(csvFiles);
         excelReader.read(excelFiles);
     }

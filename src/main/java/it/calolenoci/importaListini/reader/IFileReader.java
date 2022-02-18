@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.List;
 
 @Component
-public interface FileReader {
+public interface IFileReader {
 
     void read(List<File> file);
 }

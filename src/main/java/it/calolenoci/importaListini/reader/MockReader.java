@@ -8,7 +8,7 @@ import java.util.List;
 
 @Component
 @Primary
-public class MockReader implements FileReader {
+public class MockReader implements IFileReader {
 
 
     @Override
