@@ -8,5 +8,5 @@ import java.util.List;
 @Component
 public interface IFileReader {
 
-    void read(List<File> file);
+    void read(List<File> file, String fornitore);
 }

@@ -1,7 +1,12 @@
 package it.calolenoci.importaListini.reader;
 
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import it.calolenoci.importaListini.constant.ConstantString;
-import it.calolenoci.importaListini.model.Configuration;
+import it.calolenoci.importaListini.model.AppProperties;
+import it.calolenoci.importaListini.model.Matrice;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -16,9 +21,8 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.FileWriter;
+import java.util.*;
 
 @Component
 public class ExcelReader implements IFileReader {
@@ -26,12 +30,12 @@ public class ExcelReader implements IFileReader {
     private static final Logger log = LogManager.getLogger(ExcelReader.class);
 
     @Resource
-    private Configuration configuration;
+    private AppProperties appProperties;
 
     private Workbook wbCopyTo;
 
     @Override
-    public void read(List<File> file) {
+    public void read(List<File> file, String fornitore) {
         try {
             for (File f : file) {
                 FileInputStream inputStream = new FileInputStream(f);
@@ -45,7 +49,7 @@ public class ExcelReader implements IFileReader {
                     wbCopyTo = new XSSFWorkbook();
                     log.debug("il file " + f.getName() + " da processare è .xlsx");
                 }
-                generate(workbook, f.getName());
+                generate(workbook, f.getName(), fornitore);
                 inputStream.close();
             }
         } catch (Exception e) {
@@ -53,7 +57,7 @@ public class ExcelReader implements IFileReader {
         }
     }
 
-    private void generate(Workbook wbCopyFrom, String filename) throws Exception {
+    private void generate(Workbook wbCopyFrom, String filename, String fornitore) throws Exception {
         // FIXME da verificare la presenza dei dati sul primo sheet
         Sheet sheetCopyFrom = wbCopyFrom.getSheetAt(0);
         //FIXME da verificare la presenza dell'header nella prima row
@@ -62,36 +66,86 @@ public class ExcelReader implements IFileReader {
         int lastRow = sheetCopyFrom.getLastRowNum();
         //filtro la lista per recuperare solo i valori da riportare nel file definitivo usando una map. Così mi salvo anche il nome della colonna
         //da poter usare per la formattazione eventuale delle celle
-        Map<Integer, String> columnMap = new HashMap<>();
+        Map<Integer, String> columnFilteredMap = new HashMap<>();
         for (int cellHeaderIndex = headerRow.getFirstCellNum(); cellHeaderIndex < headerRow.getLastCellNum(); cellHeaderIndex++) {
             Cell cell = headerRow.getCell(cellHeaderIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             CellType cellType = cell.getCellType().equals(CellType.FORMULA) ? cell.getCachedFormulaResultType() : cell.getCellType();
+            // ciclo sulle configurazione fornitore.
+            // se 
             if (!cellType.equals(CellType.STRING)) {
                 break;
             }
-            if (configuration.getCodice().equals(cell.getStringCellValue()) ||
-                    configuration.getDescrizione().equals(cell.getStringCellValue()) ||
-                    configuration.getPrezzi().equals(cell.getStringCellValue())) {
-                columnMap.put(cell.getColumnIndex(), cell.getStringCellValue());
+            Map<String, String> fornitoreMap = appProperties.getFornitoriMapper().get(fornitore);
+            String excelHeaderColumn = cell.getStringCellValue();
+            //es. atlas chiave->codice
+            //          valore->codArticolo
+            if (fornitoreMap.containsKey(excelHeaderColumn)) {
+                columnFilteredMap.put(cell.getColumnIndex(), fornitoreMap.get(excelHeaderColumn));
             }
         }
-        FileOutputStream out = new FileOutputStream(configuration.getOutputDir() + "/" + filename);
+
+        List<Matrice> matriceList = new ArrayList<>();
+        List<String> headerProps = appProperties.getHeader();
+
+        for (int i = firstRow; i <= lastRow; i++) {
+            Row rowCopyFrom = sheetCopyFrom.getRow(i);
+            Matrice matrice = new Matrice();
+
+            for (Integer integer : columnFilteredMap.keySet()) {
+                Cell cellCopyFrom = rowCopyFrom.getCell(integer, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                //devo capire dove settare il valore filtrato
+
+                if(columnFilteredMap.get(integer).equals(headerProps.get(0))){
+                    matrice.setCodArticolo(cellCopyFrom.getStringCellValue());
+                }
+                if(columnFilteredMap.get(integer).equals(headerProps.get(1))){
+                    matrice.setCodEan(cellCopyFrom.getStringCellValue());
+                }
+                if(columnFilteredMap.get(integer).equals(headerProps.get(2))){
+                    matrice.setDescraarticolo(cellCopyFrom.getStringCellValue());
+                }
+            }
+            matriceList.add(matrice);
+        }
+
+        FileWriter writer = new FileWriter(appProperties.getOutputDir()+"/listino_"+fornitore+".txt");
+        ColumnPositionMappingStrategy mappingStrategy= new ColumnPositionMappingStrategy();
+        mappingStrategy.setType(Matrice.class);
+
+        // Arrange column name as provided in below array.
+        mappingStrategy.setColumnMapping(headerProps.toArray(new String[0]));
+
+        // Creating StatefulBeanToCsv object
+        StatefulBeanToCsvBuilder<Matrice> builder= new StatefulBeanToCsvBuilder(writer);
+        StatefulBeanToCsv beanWriter = builder.withMappingStrategy(mappingStrategy).build();
+
+        // Write list to StatefulBeanToCsv object
+        beanWriter.write(matriceList);
+
+        // closing the writer object
+        writer.close();
+
+
+
+
+
+/*        FileOutputStream out = new FileOutputStream(appProperties.getOutputDir() + "/" + filename);
         Sheet sheetCopyTo = wbCopyTo.createSheet(sheetCopyFrom.getSheetName());
         for (int i = firstRow; i <= lastRow; i++) {
             Row rowCopyTo = sheetCopyTo.createRow(i);
             Row rowCopyFrom = sheetCopyFrom.getRow(i);
             int counter = 0;
-            for (Integer integer : columnMap.keySet()) {
+            for (Integer integer : columnFilteredMap.keySet()) {
                 //FIXME da capire se è importante rispettare un ordine per le colonne
                 Cell cellCopyTo = rowCopyTo.createCell(counter);
                 Cell cellCopyFrom = rowCopyFrom.getCell(integer, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                setCellValue(wbCopyTo, cellCopyFrom, cellCopyTo, columnMap.get(integer));
+                setCellValue(wbCopyTo, cellCopyFrom, cellCopyTo, columnFilteredMap.get(integer));
                 counter++;
             }
         }
         wbCopyTo.write(out);
         out.close();
-        wbCopyTo.close();
+        wbCopyTo.close();*/
     }
 
 
@@ -104,7 +158,7 @@ public class ExcelReader implements IFileReader {
         if (cellType.equals(CellType.NUMERIC)) {
             if (DateUtil.isCellDateFormatted(cell)) {
                 cellCopyTo.setCellValue(cell.getDateCellValue());
-            } else if (configuration.getPrezzi().equals(colName)) {
+            } else if (1==0) {
                 CellStyle styleCurrencyFormat = wbCopyTo.createCellStyle();
                 styleCurrencyFormat.setDataFormat(HSSFDataFormat.getBuiltinFormat(ConstantString.CELL_CURRENCY_FORMAT));
                 cellCopyTo.setCellValue(cell.getNumericCellValue());

@@ -1,0 +1,43 @@
+properties:
+  header:
+    - codArticolo
+    - descraarticolo
+    - unitamisura
+    - unitamisura2
+    - unitamisuraSec
+    - coefficiente
+    - costo
+    - prezzo
+    - codiceIva
+    - classea1
+    - classea2
+    - classea3
+    - classea4
+    - classea5
+    - qtaPerConf
+    - peso
+    - quantitauser01
+    - quantitauser02
+    - quantitauser03
+    - quantitauser04
+    - quantitauser05
+    - campouser1
+    - campouser2
+    - campouser3
+    - campouser4
+    - campouser5
+  fornitorimapper:
+    atlas:
+      codice: codArticolo
+      articolo: codEan
+      descrizione: descraarticolo
+      prezzo: prezzo
+      scatola: unitamisura
+    mirage:
+      codice: codArticolo
+      art: codEan
+      descrizioni: descraarticolo
+      prezzo: prezzo
+      um: unitamisura
+  input_dir: "C:\\Workspace\\processore_listini\\listini\\input"
+  output_dir: "C:\\Workspace\\processore_listini\\listini\\output"

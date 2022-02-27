@@ -12,7 +12,7 @@ public class MockReader implements IFileReader {
 
 
     @Override
-    public void read(List<File> file) {
+    public void read(List<File> file, String fornitore) {
         // code here
     }
 }

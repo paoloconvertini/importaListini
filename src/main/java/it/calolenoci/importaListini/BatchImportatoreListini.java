@@ -1,7 +1,7 @@
 package it.calolenoci.importaListini;
 
 import it.calolenoci.importaListini.helper.ReaderHelper;
-import it.calolenoci.importaListini.model.Configuration;
+import it.calolenoci.importaListini.model.AppProperties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ public class BatchImportatoreListini {
     private static final Logger log = LogManager.getLogger(BatchImportatoreListini.class);
 
     @Resource
-    private Configuration configuration;
+    private AppProperties appProperties;
 
     @Resource
     ReaderHelper readerHelper;
@@ -32,13 +32,14 @@ public class BatchImportatoreListini {
 
         try {
             log.debug("Inizio importazione");
-            String inputDir = configuration.getInputDir();
-            File folder = new File(inputDir);
-            File[] files = folder.listFiles();
-            if(files != null){
-                readerHelper.read(files);
+            for (String fornitore : appProperties.getFornitoriMapper().keySet()) {
+                String inputDir = appProperties.getInputDir() + "/" + fornitore;
+                File folder = new File(inputDir);
+                File[] files = folder.listFiles();
+                if(files != null && files.length > 0){
+                    readerHelper.read(files, fornitore);
+                }
             }
-            log.debug("inputdir: " + inputDir);
         } catch (Exception e) {
             log.error("Errore importazione ", e);
         } finally {
