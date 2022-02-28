@@ -1,4 +1,5 @@
 properties:
+  csvQuoteSN: true
   header:
     - CodArticolo
     - CodEan
@@ -32,7 +33,7 @@ properties:
       codice: CodArticolo
       articolo: CodEan
       descrizione: Descraarticolo
-      prezzo: Prezzo
+      prezzi: Prezzo
       scatola: unitamisura
     mirage:
       codice: codArticolo
@@ -41,7 +42,7 @@ properties:
       prezzo: prezzo
       um: unitamisura
     flaminia:
-      item code: CodArticolo
+      itemcode: CodArticolo
       EAN: CodEan
       DESCRIPTION: Descraarticolo
       EURO: Prezzo
@@ -49,16 +50,5 @@ properties:
       CODICE PRODOTTO: CodArticolo
       DESCRIZIONE PRODOTTO: Descraarticolo
       Listino 07.2021: Prezzo
-spring:
-    config:
-      activate:
-        on-profile: windows
-input_dir: "C:\\Workspace\\processore_listini\\listini\\input"
-output_dir: "C:\\Workspace\\processore_listini\\listini\\output"
----
-spring:
-  config:
-    activate:
-      on-profile: mac
-input_dir: "/Users/pconvertini/Dropbox/listini/input/"
-output_dir: "/Users/pconvertini/Dropbox/listini/output/"
+  input_dir: "C:\\Workspace\\processore_listini\\listini\\input"
+  output_dir: "C:\\Workspace\\processore_listini\\listini\\output"

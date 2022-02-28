@@ -1,19 +1,21 @@
 package it.calolenoci.importaListini.writer;
 
-import com.opencsv.bean.ColumnPositionMappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import it.calolenoci.importaListini.mapping.ExcelMappingStrategy;
 import it.calolenoci.importaListini.model.AppProperties;
 import it.calolenoci.importaListini.model.Matrice;
 import it.calolenoci.importaListini.reader.ExcelReader;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
@@ -22,30 +24,338 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class ExcelWriter implements IFileWriter{
+@Component public class ExcelWriter implements IFileWriter {
 
-    @Resource
-    private AppProperties appProperties;
+    @Resource private AppProperties appProperties;
 
     private static final Logger log = LogManager.getLogger(ExcelReader.class);
 
-    @Override
-    public void write(Workbook wbCopyFrom, String filename, String fornitore) throws IOException, ParseException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+    private DataFormatter formatter;
+
+    private FormulaEvaluator evaluator;
+
+    private Map<Integer, String> columnFilteredMap = new HashMap<>();
+
+    private final List<Matrice> matriceList = new ArrayList<>();
+
+    @Override public void write(Workbook workbook, String filename, String fornitore) throws IOException, ParseException {
+        this.formatter = new DataFormatter();
+        this.evaluator = workbook.getCreationHelper().createFormulaEvaluator();
         // FIXME da verificare la presenza dei dati sul primo sheet
-        Sheet sheetCopyFrom = wbCopyFrom.getSheetAt(0);
-        //FIXME da verificare la presenza dell'header nella prima row
-        Row headerRow = sheetCopyFrom.getRow(0);
-        int firstRow = sheetCopyFrom.getFirstRowNum();
-        int lastRow = sheetCopyFrom.getLastRowNum();
+        Sheet sheet = workbook.getSheetAt(0);
+        int firstRow = getFirstNotEmptyRows(sheet);
+        Row headerRow = sheet.getRow(firstRow);
+        int lastRow = sheet.getLastRowNum();
         //filtro la lista per recuperare solo i valori da riportare nel file definitivo usando una map. Così mi salvo anche il nome della colonna
         //da poter usare per la formattazione eventuale delle celle
-        Map<Integer, String> columnFilteredMap = new HashMap<>();
-        for (int cellHeaderIndex = headerRow.getFirstCellNum(); cellHeaderIndex < headerRow.getLastCellNum(); cellHeaderIndex++) {
-            Cell cell = headerRow.getCell(cellHeaderIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+        this.columnFilteredMap = setColumnFilteredMap(fornitore, headerRow, firstRow);
+        this.convertToCSV(sheet, firstRow, lastRow);
+        File destination = new File(appProperties.getOutputDir());
+        if (!destination.exists()) {
+            throw new IllegalArgumentException(
+                    "The destination directory " + destination + " for the " + "converted CSV file(s) does not exist.");
+        }
+        if (!destination.isDirectory()) {
+            throw new IllegalArgumentException("The destination " + destination + " for the CSV " + "file(s) is not a directory/folder.");
+        }
+        this.writeCsvFile(filename, fornitore, destination);
+    }
+
+
+    private int getFirstNotEmptyRows(Sheet sheet){
+        int totalRow = sheet.getLastRowNum();
+        int currentRow = sheet.getFirstRowNum();
+        int firstNotEmptyRow = 0;
+        Row row;
+
+        while (currentRow <= totalRow) {
+            row = sheet.getRow(currentRow);
+            if (row.getPhysicalNumberOfCells() > 0){
+                firstNotEmptyRow = currentRow;
+                break;
+            }
+            currentRow++;
+        }
+        return firstNotEmptyRow;
+    }
+
+    private void writeCsvFile(String filename, String fornitore, File destination) throws IOException {
+        FileWriter writer = new FileWriter(destination + "/" + filename + "_" + fornitore + ".txt");
+        try {
+            final ExcelMappingStrategy<Matrice> mappingStrategy = new ExcelMappingStrategy<>();
+            mappingStrategy.setColumnMapping();
+            mappingStrategy.setType(Matrice.class);
+
+            final StatefulBeanToCsv<Matrice> beanToCsv = new StatefulBeanToCsvBuilder<Matrice>(writer).withMappingStrategy(mappingStrategy)
+                    .withApplyQuotesToAll(appProperties.getCsvQuoteSN()).withSeparator('\t').build();
+            beanToCsv.write(matriceList);
+        } catch (CsvRequiredFieldEmptyException e) {
+            log.error("CsvRequiredFieldEmptyException: ", e);
+        } catch (CsvDataTypeMismatchException ex) {
+            log.error("CsvDataTypeMismatchException: ", ex);
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception ee) {
+                log.error("Error closing csv writer: ", ee);
+            }
+        }
+    }
+
+    /**
+     * Called to convert the contents of the currently opened workbook into
+     * a CSV file.
+     */
+    private void convertToCSV(Sheet sheetCopyFrom, int firstRow, int lastRow) throws ParseException {
+        log.debug("Converting files contents to CSV format.");
+        for (int i = (firstRow + 1); i <= lastRow; i++) {
+            Row row = sheetCopyFrom.getRow(i);
+            Matrice matrice = this.rowToCSV(row);
+            this.matriceList.add(matrice);
+        }
+    }
+
+    /**
+     * Called to convert a row of cells into a line of data that can later be
+     * output to the CSV file.
+     *
+     * @param row               An instance of either the HSSFRow or XSSFRow classes that
+     *                          encapsulates information about a row of cells recovered from
+     *                          an Excel workbook.
+     *
+     * @return Matrice
+     */
+    private Matrice rowToCSV(Row row) throws ParseException {
+        log.debug("Processing row...");
+        Matrice matrice = new Matrice();
+        List<String> headerProps = appProperties.getHeader();
+        for (Integer integer : this.columnFilteredMap.keySet()) {
+            Cell cellCopyFrom = row.getCell(integer, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            //devo capire dove settare il valore filtrato
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(0))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCodArticolo(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCodArticolo(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(1))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCodEan(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCodEan(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(2))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setDescraarticolo(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setDescraarticolo(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(3))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setUnitamisura(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setUnitamisura(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(4))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setUnitamisura2(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setUnitamisura2(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(5))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setUnitamisuraSec(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setUnitamisuraSec(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(6))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCoefficiente(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCoefficiente(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(7))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCosto(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCosto(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(8))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setPrezzo(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setPrezzo(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(9))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCodiceIva(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCodiceIva(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(10))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setClassea1(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setClassea1(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(11))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setClassea2(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setClassea2(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(12))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setClassea3(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setClassea3(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(13))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setClassea4(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setClassea4(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(14))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setClassea5(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setClassea5(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(15))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setQtaPerConf(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setQtaPerConf(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(16))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setPeso(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setPeso(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(17))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setQuantitauser01(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setQuantitauser01(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(18))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setQuantitauser02(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setQuantitauser02(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(19))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setQuantitauser03(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setQuantitauser03(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(20))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setQuantitauser04(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setQuantitauser04(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(21))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setQuantitauser05(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setQuantitauser05(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(22))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCampouser1(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCampouser1(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(23))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCampouser2(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCampouser2(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(24))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCampouser3(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCampouser3(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(25))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCampouser4(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCampouser4(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+                continue;
+            }
+            if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(26))) {
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setCampouser5(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setCampouser5(formatter.formatCellValue(cellCopyFrom, evaluator));
+                }
+            }
+        }
+        return matrice;
+    }
+
+    private Map<Integer, String> setColumnFilteredMap(String fornitore, Row row, int firstRow) {
+        for (int i = firstRow; i < row.getLastCellNum(); i++) {
+            Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             CellType cellType = cell.getCellType().equals(CellType.FORMULA) ? cell.getCachedFormulaResultType() : cell.getCellType();
             // ciclo sulle configurazione fornitore.
-            // se
             if (!cellType.equals(CellType.STRING)) {
                 break;
             }
@@ -53,122 +363,10 @@ public class ExcelWriter implements IFileWriter{
             String excelHeaderColumn = cell.getStringCellValue();
             //es. atlas chiave->codice
             //          valore->codArticolo
-            if (fornitoreMap.containsKey(excelHeaderColumn)) {
-                columnFilteredMap.put(cell.getColumnIndex(), fornitoreMap.get(excelHeaderColumn));
+            if (fornitoreMap.containsKey(StringUtils.deleteWhitespace(excelHeaderColumn))) {
+                this.columnFilteredMap.put(cell.getColumnIndex(), fornitoreMap.get(StringUtils.deleteWhitespace(excelHeaderColumn)));
             }
         }
-
-        List<Matrice> matriceList = new ArrayList<>();
-        List<String> headerProps = appProperties.getHeader();
-
-        for (int i = firstRow; i <= lastRow; i++) {
-            Row rowCopyFrom = sheetCopyFrom.getRow(i);
-            Matrice matrice = new Matrice();
-
-            for (Integer integer : columnFilteredMap.keySet()) {
-                Cell cellCopyFrom = rowCopyFrom.getCell(integer, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                //devo capire dove settare il valore filtrato
-
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(0))){
-                    matrice.setCodArticolo(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(1))){
-                    matrice.setCodEan(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(2))){
-                    matrice.setDescraarticolo(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(3))){
-                    matrice.setUnitamisura(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(4))){
-                    matrice.setUnitamisura2(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(5))){
-                    matrice.setUnitamisuraSec(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(6))){
-                    matrice.setCoefficiente(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(7))){
-                    matrice.setCosto(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(8))){
-                    matrice.setPrezzo(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(9))){
-                    matrice.setCodiceIva(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(10))){
-                    matrice.setClassea1(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(11))){
-                    matrice.setClassea2(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(12))){
-                    matrice.setClassea3(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(13))){
-                    matrice.setClassea4(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(14))){
-                    matrice.setClassea5(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(15))){
-                    matrice.setQtaPerConf(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(16))){
-                    matrice.setPeso(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(17))){
-                    matrice.setQuantitauser01(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(18))){
-                    matrice.setQuantitauser02(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(19))){
-                    matrice.setQuantitauser03(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(20))){
-                    matrice.setQuantitauser04(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(21))){
-                    matrice.setQuantitauser05(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(22))){
-                    matrice.setCampouser1(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(23))){
-                    matrice.setCampouser2(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(24))){
-                    matrice.setCampouser3(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(25))){
-                    matrice.setCampouser4(cellCopyFrom.getStringCellValue());
-                }
-                if(columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(26))){
-                    matrice.setCampouser5(cellCopyFrom.getStringCellValue());
-                }
-            }
-            matriceList.add(matrice);
-        }
-
-        FileWriter writer = new FileWriter(appProperties.getOutputDir()+"/"+filename+"_"+fornitore+".txt");
-        ColumnPositionMappingStrategy mappingStrategy= new ColumnPositionMappingStrategy();
-        mappingStrategy.setType(Matrice.class);
-
-        // Arrange column name as provided in below array.
-        mappingStrategy.setColumnMapping(headerProps.toArray(new String[0]));
-
-        // Creating StatefulBeanToCsv object
-        StatefulBeanToCsvBuilder<Matrice> builder= new StatefulBeanToCsvBuilder(writer);
-        StatefulBeanToCsv beanWriter = builder.withMappingStrategy(mappingStrategy).build();
-
-        // Write list to StatefulBeanToCsv object
-        beanWriter.write(matriceList);
-
-        // closing the writer object
-        writer.close();
+        return this.columnFilteredMap;
     }
 }

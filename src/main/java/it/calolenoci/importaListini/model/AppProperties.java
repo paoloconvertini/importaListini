@@ -15,6 +15,15 @@ public class AppProperties {
     private List<String> header;
     private String inputDir;
     private String outputDir;
+    private Boolean csvQuoteSN;
+
+    public Boolean getCsvQuoteSN() {
+        return csvQuoteSN;
+    }
+
+    public void setCsvQuoteSN(Boolean csvQuoteSN) {
+        this.csvQuoteSN = csvQuoteSN;
+    }
 
     public List<String> getHeader() {
         return header;

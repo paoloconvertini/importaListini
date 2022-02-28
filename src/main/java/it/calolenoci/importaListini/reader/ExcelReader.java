@@ -19,38 +19,44 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.*;
 
-@Component
-public class ExcelReader implements IFileReader {
+@Component public class ExcelReader implements IFileReader {
 
     private static final Logger log = LogManager.getLogger(ExcelReader.class);
 
     @Resource
     IFileWriter excelWriter;
 
+    private Workbook         workbook;
+
     @Override
     public void read(List<File> file, String fornitore) {
         try {
             for (File f : file) {
-                FileInputStream inputStream = new FileInputStream(f);
-                Workbook workbook;
-                if (StringUtils.equals(ConstantString.XLS, FilenameUtils.getExtension(f.getPath()))) {
-                    workbook = new HSSFWorkbook(inputStream);
-                    log.debug("il file " + f.getName() + " da processare è .xls");
-                } else {
-                    workbook = new XSSFWorkbook(inputStream);
-                    log.debug("il file " + f.getName() + " da processare è .xlsx");
-                }
+                // Open the workbook
+                this.openWorkbook(f);
                 excelWriter.write(workbook, f.getName(), fornitore);
-                inputStream.close();
             }
         } catch (Exception e) {
             log.error("Errore durante importazione dei file excel", e);
+        }
+    }
+
+    /**
+     * Open an Excel workbook ready for conversion.
+     *
+     * @param file An instance of the File class that encapsulates a handle
+     *             to a valid Excel workbook. Note that the workbook can be in
+     *             either binary (.xls) or SpreadsheetML (.xlsx) format.
+     * @throws java.io.FileNotFoundException Thrown if the file cannot be located.
+     * @throws java.io.IOException           Thrown if a problem occurs in the file system.
+     */
+    private void openWorkbook(File file) throws FileNotFoundException, IOException {
+        log.debug("Opening workbook [" + file.getName() + "]");
+        try (FileInputStream fis = new FileInputStream(file)) {
+            this.workbook = WorkbookFactory.create(fis);
         }
     }
 

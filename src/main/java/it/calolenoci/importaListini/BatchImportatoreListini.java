@@ -34,10 +34,15 @@ public class BatchImportatoreListini {
             log.debug("Inizio importazione");
             for (String fornitore : appProperties.getFornitoriMapper().keySet()) {
                 String inputDir = appProperties.getInputDir() + "/" + fornitore;
-                File folder = new File(inputDir);
-                File[] files = folder.listFiles();
-                if(files != null && files.length > 0){
-                    readerHelper.read(files, fornitore);
+                File source = new File(inputDir);
+                if(!source.exists()) {
+                    log.debug("The source for the Excel file(s) cannot be found at " + source);
+                }
+                if(source.isDirectory()){
+                    File[] files = source.listFiles();
+                    if(files != null && files.length > 0){
+                        readerHelper.read(files, fornitore);
+                    }
                 }
             }
         } catch (Exception e) {
