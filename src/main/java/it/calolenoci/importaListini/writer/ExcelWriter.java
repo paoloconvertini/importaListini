@@ -8,6 +8,8 @@ import it.calolenoci.importaListini.mapping.ExcelMappingStrategy;
 import it.calolenoci.importaListini.model.AppProperties;
 import it.calolenoci.importaListini.model.Matrice;
 import it.calolenoci.importaListini.reader.ExcelReader;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,7 +82,9 @@ import java.util.Map;
     }
 
     private void writeCsvFile(String filename, String fornitore, File destination) throws IOException {
-        FileWriter writer = new FileWriter(destination + "/" + filename + "_" + fornitore + ".txt");
+        String extension = FilenameUtils.getExtension(filename);
+        String filenameWithoutExt = StringUtils.remove(filename, extension);
+        FileWriter writer = new FileWriter(destination + "/" + filenameWithoutExt + ".txt");
         try {
             final ExcelMappingStrategy<Matrice> mappingStrategy = new ExcelMappingStrategy<>();
             mappingStrategy.setColumnMapping();
@@ -96,6 +100,13 @@ import java.util.Map;
         } finally {
             try {
                 writer.close();
+                try{
+                    File sourceFile = new File(appProperties.getInputDir()+"/"+fornitore+"/"+filename);
+                    File destFile = new File(appProperties.getImportedDir()+"/"+filename);
+                    FileUtils.moveFile(sourceFile, destFile);
+                } catch (IOException e){
+                    log.error("Error moving file: ", e);
+                }
             } catch (Exception ee) {
                 log.error("Error closing csv writer: ", ee);
             }
@@ -127,7 +138,7 @@ import java.util.Map;
      * @return Matrice
      */
     private Matrice rowToCSV(Row row) throws ParseException {
-        log.debug("Processing row...");
+        log.debug("Processing row..." + row.getRowNum());
         Matrice matrice = new Matrice();
         List<String> headerProps = appProperties.getHeader();
         for (Integer integer : this.columnFilteredMap.keySet()) {

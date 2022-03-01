@@ -1,3 +1,11 @@
+logging:
+  level:
+    root: INFO
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+    file: "%d %-5level [%thread] %logger : %msg%n"
+  file:
+    name: ./logs/importatoreListini.log
 properties:
   csvQuoteSN: true
   header:
@@ -53,3 +61,4 @@ properties:
       Listino 07.2021: Prezzo
   input_dir: "C:\\Workspace\\processore_listini\\listini\\input"
   output_dir: "C:\\Workspace\\processore_listini\\listini\\output"
+  imported_dir: "C:\\Workspace\\processore_listini\\listini\\importati"

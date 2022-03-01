@@ -15,7 +15,16 @@ public class AppProperties {
     private List<String> header;
     private String inputDir;
     private String outputDir;
+    private String importedDir;
     private Boolean csvQuoteSN;
+
+    public String getImportedDir() {
+        return importedDir;
+    }
+
+    public void setImportedDir(String importedDir) {
+        this.importedDir = importedDir;
+    }
 
     public Boolean getCsvQuoteSN() {
         return csvQuoteSN;

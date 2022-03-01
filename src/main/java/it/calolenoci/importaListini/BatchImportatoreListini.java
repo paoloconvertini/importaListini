@@ -31,7 +31,7 @@ public class BatchImportatoreListini {
         long startBatch = System.currentTimeMillis();
 
         try {
-            log.debug("Inizio importazione");
+            log.info("Inizio importazione");
             for (String fornitore : appProperties.getFornitoriMapper().keySet()) {
                 String inputDir = appProperties.getInputDir() + "/" + fornitore;
                 File source = new File(inputDir);
