@@ -28,6 +28,7 @@ properties:
     - campouser3
     - campouser4
     - campouser5
+    - PrezzoListinoFornitore
   fornitorimapper:
     atlas:
       codice: CodArticolo
@@ -38,8 +39,8 @@ properties:
     mirage:
       codice: codArticolo
       art: codEan
-      descrizioni: descraarticolo
-      prezzo: prezzo
+      descrizione: descraarticolo
+      prezzi: prezzo
       um: unitamisura
     flaminia:
       itemcode: CodArticolo

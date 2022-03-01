@@ -36,7 +36,7 @@ import java.util.Map;
 
     private Map<Integer, String> columnFilteredMap = new HashMap<>();
 
-    private final List<Matrice> matriceList = new ArrayList<>();
+    private List<Matrice> matriceList;
 
     @Override public void write(Workbook workbook, String filename, String fornitore) throws IOException, ParseException {
         this.formatter = new DataFormatter();
@@ -108,6 +108,7 @@ import java.util.Map;
      */
     private void convertToCSV(Sheet sheetCopyFrom, int firstRow, int lastRow) throws ParseException {
         log.debug("Converting files contents to CSV format.");
+        this.matriceList = new ArrayList<>();
         for (int i = (firstRow + 1); i <= lastRow; i++) {
             Row row = sheetCopyFrom.getRow(i);
             Matrice matrice = this.rowToCSV(row);
@@ -357,7 +358,7 @@ import java.util.Map;
             CellType cellType = cell.getCellType().equals(CellType.FORMULA) ? cell.getCachedFormulaResultType() : cell.getCellType();
             // ciclo sulle configurazione fornitore.
             if (!cellType.equals(CellType.STRING)) {
-                break;
+                continue;
             }
             Map<String, String> fornitoreMap = appProperties.getFornitoriMapper().get(fornitore);
             String excelHeaderColumn = cell.getStringCellValue();

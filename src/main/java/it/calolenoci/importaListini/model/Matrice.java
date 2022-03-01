@@ -121,6 +121,10 @@ public class Matrice {
     @CsvBindByPosition(position = 26)
     private String campouser5;
 
+    @CsvBindByName(column = "PrezzoListinoFornitore")
+    @CsvBindByPosition(position = 27)
+    private String prezzoListinoFornitore;
+
     public Matrice() {
     }
 
@@ -152,13 +156,14 @@ public class Matrice {
         this.campouser3 = header.get(24);
         this.campouser4 = header.get(25);
         this.campouser5 = header.get(26);
+        this.prezzoListinoFornitore = header.get(27);
     }
 
     public Matrice(String codArticolo, String codEan, String descraarticolo, String unitamisura, String unitamisura2, String unitamisuraSec,
             String coefficiente, String costo, String prezzo, String codiceIva, String classea1, String classea2, String classea3,
             String classea4, String classea5, String qtaPerConf, String peso, String quantitauser01, String quantitauser02,
             String quantitauser03, String quantitauser04, String quantitauser05, String campouser1, String campouser2, String campouser3,
-            String campouser4, String campouser5) {
+            String campouser4, String campouser5, String prezzoListinoFornitore) {
         this.codArticolo = codArticolo;
         this.codEan = codEan;
         this.descraarticolo = descraarticolo;
@@ -186,6 +191,7 @@ public class Matrice {
         this.campouser3 = campouser3;
         this.campouser4 = campouser4;
         this.campouser5 = campouser5;
+        this.prezzoListinoFornitore = prezzoListinoFornitore;
     }
 
         private String formatCurrency(String amount) throws ParseException {
@@ -194,6 +200,14 @@ public class Matrice {
             DecimalFormat formatter = new DecimalFormat(ConstantString.CSV_CURRENCY_FORMAT);
             return formatter.format(number.doubleValue());
         }
+
+    public String getPrezzoListinoFornitore() {
+        return prezzoListinoFornitore;
+    }
+
+    public void setPrezzoListinoFornitore(String prezzoListinoFornitore) {
+        this.prezzoListinoFornitore = prezzoListinoFornitore;
+    }
 
     public String getCodArticolo() {
         return codArticolo;
