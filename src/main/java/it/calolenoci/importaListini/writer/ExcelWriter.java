@@ -84,7 +84,7 @@ import java.util.Map;
     private void writeCsvFile(String filename, String fornitore, File destination) throws IOException {
         String extension = FilenameUtils.getExtension(filename);
         String filenameWithoutExt = StringUtils.remove(filename, extension);
-        FileWriter writer = new FileWriter(destination + "/" + filenameWithoutExt + ".txt");
+        FileWriter writer = new FileWriter(destination + "/" + filenameWithoutExt + "txt");
         try {
             final ExcelMappingStrategy<Matrice> mappingStrategy = new ExcelMappingStrategy<>();
             mappingStrategy.setColumnMapping();

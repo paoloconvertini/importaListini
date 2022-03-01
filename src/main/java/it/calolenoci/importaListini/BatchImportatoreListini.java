@@ -37,6 +37,10 @@ public class BatchImportatoreListini {
                 File source = new File(inputDir);
                 if(!source.exists()) {
                     log.debug("The source for the Excel file(s) cannot be found at " + source);
+                    boolean mkdir = source.mkdir();
+                    if(mkdir){
+                        log.info("cartella per il fornitore " + fornitore + " creata!");
+                    }
                 }
                 if(source.isDirectory()){
                     File[] files = source.listFiles();

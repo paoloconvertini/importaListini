@@ -1,13 +1,13 @@
 logging:
   level:
-    root: INFO
-  pattern:
-    console: "%d %-5level %logger : %msg%n"
-    file: "%d %-5level [%thread] %logger : %msg%n"
+    root: ERROR
   file:
     name: ./logs/importatoreListini.log
 properties:
   csvQuoteSN: true
+  input_dir: "C:\\Workspace\\processore_listini\\listini\\input"
+  output_dir: "C:\\Workspace\\processore_listini\\listini\\output"
+  imported_dir: "C:\\Workspace\\processore_listini\\listini\\importati"
   header:
     - CodArticolo
     - CodEan
@@ -59,6 +59,3 @@ properties:
       CODICE PRODOTTO: CodArticolo
       DESCRIZIONE PRODOTTO: Descraarticolo
       Listino 07.2021: Prezzo
-  input_dir: "C:\\Workspace\\processore_listini\\listini\\input"
-  output_dir: "C:\\Workspace\\processore_listini\\listini\\output"
-  imported_dir: "C:\\Workspace\\processore_listini\\listini\\importati"
