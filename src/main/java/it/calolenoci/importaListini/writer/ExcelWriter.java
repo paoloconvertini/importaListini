@@ -105,13 +105,14 @@ import java.util.Map;
                 writer.close();
                 try{
                     File sourceFile = new File(appProperties.getInputDir()+"/"+fornitore+"/"+filename);
-                    File destFile = new File(appProperties.getImportedDir()+"/"+filename);
-                    if(!destFile.exists()){
-                        boolean mkdir = destFile.mkdir();
+                    File importedFolder = new File(appProperties.getImportedDir());
+                    if(!importedFolder.exists()){
+                        boolean mkdir = importedFolder.mkdir();
                         if(mkdir){
-                            log.debug("cartella importati creata!");
+                            log.debug("cartella importati creata");
                         }
                     }
+                    File destFile = new File(importedFolder+"/"+filename);
                     FileUtils.moveFile(sourceFile, destFile);
                 } catch (IOException e){
                     log.error("Error moving file: ", e);
