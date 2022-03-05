@@ -53,9 +53,12 @@ import java.util.Map;
         this.columnFilteredMap = setColumnFilteredMap(fornitore, headerRow, firstRow);
         this.convertToCSV(sheet, firstRow, lastRow);
         File destination = new File(appProperties.getOutputDir());
-        if (!destination.exists()) {
-            throw new IllegalArgumentException(
-                    "The destination directory " + destination + " for the " + "converted CSV file(s) does not exist.");
+        if(!destination.exists()){
+            log.debug("The destination directory cannot be found");
+            boolean mkdir = destination.mkdir();
+            if(mkdir){
+                log.info("cartella d'uscita creata!");
+            }
         }
         if (!destination.isDirectory()) {
             throw new IllegalArgumentException("The destination " + destination + " for the CSV " + "file(s) is not a directory/folder.");
@@ -103,6 +106,12 @@ import java.util.Map;
                 try{
                     File sourceFile = new File(appProperties.getInputDir()+"/"+fornitore+"/"+filename);
                     File destFile = new File(appProperties.getImportedDir()+"/"+filename);
+                    if(!destFile.exists()){
+                        boolean mkdir = destFile.mkdir();
+                        if(mkdir){
+                            log.debug("cartella importati creata!");
+                        }
+                    }
                     FileUtils.moveFile(sourceFile, destFile);
                 } catch (IOException e){
                     log.error("Error moving file: ", e);

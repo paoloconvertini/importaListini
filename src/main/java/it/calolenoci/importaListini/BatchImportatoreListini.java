@@ -31,10 +31,17 @@ public class BatchImportatoreListini {
         long startBatch = System.currentTimeMillis();
 
         try {
+            File inputFolder = new File(appProperties.getInputDir());
+            if(!inputFolder.exists()){
+                log.debug("The inputFolder cannot be found");
+                boolean mkdir = inputFolder.mkdir();
+                if(mkdir){
+                    log.info("cartella d'ingresso creata!");
+                }
+            }
             log.info("Inizio importazione");
             for (String fornitore : appProperties.getFornitoriMapper().keySet()) {
-                String inputDir = appProperties.getInputDir() + "/" + fornitore;
-                File source = new File(inputDir);
+                File source = new File(inputFolder + "/" + fornitore);
                 if(!source.exists()) {
                     log.debug("The source for the Excel file(s) cannot be found at " + source);
                     boolean mkdir = source.mkdir();
