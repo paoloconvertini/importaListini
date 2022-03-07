@@ -282,6 +282,7 @@ public class Matrice {
     }
 
     public void setPrezzo(String prezzo)  throws ParseException{
+
         if(StringUtils.isNotBlank(prezzo)){
             this.prezzo = formatCurrency(prezzo);
         } else {

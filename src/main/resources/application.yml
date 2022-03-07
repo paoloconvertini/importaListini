@@ -44,18 +44,22 @@ properties:
       descrizione: Descraarticolo
       prezzi: Prezzo
       scatola: unitamisura
+      aumento_perc:
     mirage:
       codice: codArticolo
       art: codEan
       descrizione: descraarticolo
       prezzi: prezzo
       um: unitamisura
+      aumento_perc:
     flaminia:
       itemcode: CodArticolo
       EAN: CodEan
       DESCRIPTION: Descraarticolo
       EURO: Prezzo
+      aumento_perc:
     chaffoteaux:
       CODICE PRODOTTO: CodArticolo
       DESCRIZIONE PRODOTTO: Descraarticolo
       Listino 07.2021: Prezzo
+      aumento_perc: 10

@@ -40,7 +40,10 @@ import java.util.Map;
 
     private List<Matrice> matriceList;
 
+    private String fornitore;
+
     @Override public void write(Workbook workbook, String filename, String fornitore) throws IOException, ParseException {
+        this.fornitore = fornitore;
         this.formatter = new DataFormatter();
         this.evaluator = workbook.getCreationHelper().createFormulaEvaluator();
         // FIXME da verificare la presenza dei dati sul primo sheet
@@ -63,7 +66,7 @@ import java.util.Map;
         if (!destination.isDirectory()) {
             throw new IllegalArgumentException("The destination " + destination + " for the CSV " + "file(s) is not a directory/folder.");
         }
-        this.writeCsvFile(filename, fornitore, destination);
+        this.writeCsvFile(filename, destination);
     }
 
 
@@ -84,7 +87,7 @@ import java.util.Map;
         return firstNotEmptyRow;
     }
 
-    private void writeCsvFile(String filename, String fornitore, File destination) throws IOException {
+    private void writeCsvFile(String filename, File destination) throws IOException {
         String extension = FilenameUtils.getExtension(filename);
         String filenameWithoutExt = StringUtils.remove(filename, extension);
         FileWriter writer = new FileWriter(destination + "/" + filenameWithoutExt + "txt");
@@ -219,11 +222,19 @@ import java.util.Map;
                 continue;
             }
             if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(8))) {
+                String prezzo;
                 if (cellCopyFrom.getCellType() != CellType.FORMULA) {
-                    matrice.setPrezzo(formatter.formatCellValue(cellCopyFrom));
+                    prezzo = formatter.formatCellValue(cellCopyFrom);
                 } else {
-                    matrice.setPrezzo(formatter.formatCellValue(cellCopyFrom, evaluator));
+                    prezzo = formatter.formatCellValue(cellCopyFrom, evaluator);
                 }
+                if(appProperties.getFornitoriMapper().get(fornitore).get("aumento_perc") != null){
+                    log.debug("applicare l'aumento della percentuale");
+                    int price = Integer.parseInt(prezzo);
+                    prezzo = String.valueOf((price + (price*appProperties.getAumentoPerc()/100)));
+                    log.debug("il nuovo prezzo è di: " + prezzo);
+                }
+                matrice.setPrezzo(prezzo);
                 continue;
             }
             if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(9))) {
