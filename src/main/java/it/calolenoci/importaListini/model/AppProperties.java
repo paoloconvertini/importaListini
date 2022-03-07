@@ -17,15 +17,6 @@ public class AppProperties {
     private String outputDir;
     private String importedDir;
     private Boolean csvQuoteSN;
-    private Integer aumentoPerc;
-
-    public Integer getAumentoPerc() {
-        return aumentoPerc;
-    }
-
-    public void setAumentoPerc(Integer aumentoPerc) {
-        this.aumentoPerc = aumentoPerc;
-    }
 
     public String getImportedDir() {
         return importedDir;

@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,12 +75,24 @@ import java.util.Map;
         int totalRow = sheet.getLastRowNum();
         int currentRow = sheet.getFirstRowNum();
         int firstNotEmptyRow = 0;
+        boolean breakRow = false;
         Row row;
 
         while (currentRow <= totalRow) {
             row = sheet.getRow(currentRow);
             if (row.getPhysicalNumberOfCells() > 0){
-                firstNotEmptyRow = currentRow;
+                for (Cell cell : row) {
+                    if(!cell.getCellType().equals(CellType.STRING)){
+                        continue;
+                    }
+                    if(appProperties.getFornitoriMapper().get(fornitore).containsKey(StringUtils.deleteWhitespace(cell.getStringCellValue()))){
+                        firstNotEmptyRow = currentRow;
+                        breakRow = true;
+                        break;
+                    }
+                }
+            }
+            if(breakRow){
                 break;
             }
             currentRow++;
@@ -222,19 +235,20 @@ import java.util.Map;
                 continue;
             }
             if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(8))) {
-                String prezzo;
-                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
-                    prezzo = formatter.formatCellValue(cellCopyFrom);
-                } else {
-                    prezzo = formatter.formatCellValue(cellCopyFrom, evaluator);
-                }
-                if(appProperties.getFornitoriMapper().get(fornitore).get("aumento_perc") != null){
+                double prezzo;
+                prezzo = cellCopyFrom.getNumericCellValue();
+                if(appProperties.getFornitoriMapper().get(fornitore).containsKey("aumento_perc") &&
+                        appProperties.getFornitoriMapper().get(fornitore).get("aumento_perc") != null){
                     log.debug("applicare l'aumento della percentuale");
-                    int price = Integer.parseInt(prezzo);
-                    prezzo = String.valueOf((price + (price*appProperties.getAumentoPerc()/100)));
+                    double aumento = Integer.parseInt(appProperties.getFornitoriMapper().get(fornitore).get("aumento_perc"));
+                    double tot = prezzo + (prezzo * aumento / 100);
+                    NumberFormat formatter = NumberFormat.getNumberInstance();
                     log.debug("il nuovo prezzo è di: " + prezzo);
+                    matrice.setPrezzo(formatter.format(tot));
+                    continue;
                 }
-                matrice.setPrezzo(prezzo);
+                NumberFormat formatter = NumberFormat.getNumberInstance();
+                matrice.setPrezzo(formatter.format(prezzo));
                 continue;
             }
             if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(9))) {

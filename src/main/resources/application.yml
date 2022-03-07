@@ -44,7 +44,6 @@ properties:
       descrizione: Descraarticolo
       prezzi: Prezzo
       scatola: unitamisura
-      aumento_perc:
     mirage:
       codice: codArticolo
       art: codEan
@@ -57,7 +56,6 @@ properties:
       EAN: CodEan
       DESCRIPTION: Descraarticolo
       EURO: Prezzo
-      aumento_perc:
     chaffoteaux:
       CODICE PRODOTTO: CodArticolo
       DESCRIZIONE PRODOTTO: Descraarticolo
