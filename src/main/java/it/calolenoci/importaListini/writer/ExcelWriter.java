@@ -47,29 +47,48 @@ import java.util.Map;
         this.fornitore = fornitore;
         this.formatter = new DataFormatter();
         this.evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-        // FIXME da verificare la presenza dei dati sul primo sheet
-        Sheet sheet = workbook.getSheetAt(0);
-        int firstRow = getFirstNotEmptyRows(sheet);
-        Row headerRow = sheet.getRow(firstRow);
-        int lastRow = sheet.getLastRowNum();
-        //filtro la lista per recuperare solo i valori da riportare nel file definitivo usando una map. Così mi salvo anche il nome della colonna
-        //da poter usare per la formattazione eventuale delle celle
-        this.columnFilteredMap = setColumnFilteredMap(fornitore, headerRow, firstRow);
-        this.convertToCSV(sheet, firstRow, lastRow);
-        File destination = new File(appProperties.getOutputDir());
-        if(!destination.exists()){
-            log.debug("The destination directory cannot be found");
-            boolean mkdir = destination.mkdir();
-            if(mkdir){
-                log.info("cartella d'uscita creata!");
+        int index = 1;
+        for (Sheet sheet : workbook) {
+            int firstRow = getFirstNotEmptyRows(sheet);
+            Row headerRow = sheet.getRow(firstRow);
+            int lastRow = sheet.getLastRowNum();
+            //filtro la lista per recuperare solo i valori da riportare nel file definitivo usando una map. Così mi salvo anche il nome della colonna
+            //da poter usare per la formattazione eventuale delle celle
+            this.columnFilteredMap = setColumnFilteredMap(fornitore, headerRow, firstRow);
+            this.convertToCSV(sheet, firstRow, lastRow);
+            File destination = new File(appProperties.getOutputDir());
+            if(!destination.exists()){
+                log.debug("The destination directory cannot be found");
+                boolean mkdir = destination.mkdir();
+                if(mkdir){
+                    log.info("cartella d'uscita creata!");
+                }
             }
+            if (!destination.isDirectory()) {
+                throw new IllegalArgumentException("The destination " + destination + " for the CSV " + "file(s) is not a directory/folder.");
+            }
+            this.writeCsvFile(filename, destination, index);
+            index++;
         }
-        if (!destination.isDirectory()) {
-            throw new IllegalArgumentException("The destination " + destination + " for the CSV " + "file(s) is not a directory/folder.");
-        }
-        this.writeCsvFile(filename, destination);
+        this.moveExcelFile(filename);
     }
 
+    private void moveExcelFile(String filename){
+        try{
+            File sourceFile = new File(appProperties.getInputDir()+"/"+fornitore+"/"+filename);
+            File importedFolder = new File(appProperties.getImportedDir());
+            if(!importedFolder.exists()){
+                boolean mkdir = importedFolder.mkdir();
+                if(mkdir){
+                    log.debug("cartella importati creata");
+                }
+            }
+            File destFile = new File(importedFolder+"/"+filename);
+            FileUtils.moveFile(sourceFile, destFile);
+        } catch (IOException e){
+            log.error("Error moving file: ", e);
+        }
+    }
 
     private int getFirstNotEmptyRows(Sheet sheet){
         int totalRow = sheet.getLastRowNum();
@@ -100,10 +119,17 @@ import java.util.Map;
         return firstNotEmptyRow;
     }
 
-    private void writeCsvFile(String filename, File destination) throws IOException {
+    private void writeCsvFile(String filename, File destination, int i) throws IOException {
         String extension = FilenameUtils.getExtension(filename);
-        String filenameWithoutExt = StringUtils.remove(filename, extension);
-        FileWriter writer = new FileWriter(destination + "/" + filenameWithoutExt + "txt");
+        String filenameWithoutExt = StringUtils.remove(filename, ("." + extension));
+        File destFolder = new File(destination + "/" + fornitore);
+        if(!destFolder.exists()){
+            boolean mkdir = destFolder.mkdir();
+            if(mkdir){
+                log.debug("cartella output per il fornitore " + fornitore + " creata");
+            }
+        }
+        FileWriter writer = new FileWriter(destFolder + "/" + filenameWithoutExt + "_" + i + ".txt");
         try {
             final ExcelMappingStrategy<Matrice> mappingStrategy = new ExcelMappingStrategy<>();
             mappingStrategy.setColumnMapping();
@@ -119,20 +145,6 @@ import java.util.Map;
         } finally {
             try {
                 writer.close();
-                try{
-                    File sourceFile = new File(appProperties.getInputDir()+"/"+fornitore+"/"+filename);
-                    File importedFolder = new File(appProperties.getImportedDir());
-                    if(!importedFolder.exists()){
-                        boolean mkdir = importedFolder.mkdir();
-                        if(mkdir){
-                            log.debug("cartella importati creata");
-                        }
-                    }
-                    File destFile = new File(importedFolder+"/"+filename);
-                    FileUtils.moveFile(sourceFile, destFile);
-                } catch (IOException e){
-                    log.error("Error moving file: ", e);
-                }
             } catch (Exception ee) {
                 log.error("Error closing csv writer: ", ee);
             }
