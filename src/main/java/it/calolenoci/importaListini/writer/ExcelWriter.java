@@ -4,6 +4,7 @@ import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import it.calolenoci.importaListini.constant.ConstantString;
 import it.calolenoci.importaListini.mapping.ExcelMappingStrategy;
 import it.calolenoci.importaListini.model.AppProperties;
 import it.calolenoci.importaListini.model.Matrice;
@@ -20,11 +21,14 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Component public class ExcelWriter implements IFileWriter {
@@ -247,20 +251,11 @@ import java.util.Map;
                 continue;
             }
             if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(8))) {
-                double prezzo;
-                prezzo = cellCopyFrom.getNumericCellValue();
-                if(appProperties.getFornitoriMapper().get(fornitore).containsKey("aumento_perc") &&
-                        appProperties.getFornitoriMapper().get(fornitore).get("aumento_perc") != null){
-                    log.debug("applicare l'aumento della percentuale");
-                    double aumento = Integer.parseInt(appProperties.getFornitoriMapper().get(fornitore).get("aumento_perc"));
-                    double tot = prezzo + (prezzo * aumento / 100);
-                    NumberFormat formatter = NumberFormat.getNumberInstance();
-                    log.debug("il nuovo prezzo è di: " + prezzo);
-                    matrice.setPrezzo(formatter.format(tot));
-                    continue;
+                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
+                    matrice.setPrezzo(formatter.formatCellValue(cellCopyFrom));
+                } else {
+                    matrice.setPrezzo(formatter.formatCellValue(cellCopyFrom, evaluator));
                 }
-                NumberFormat formatter = NumberFormat.getNumberInstance();
-                matrice.setPrezzo(formatter.format(prezzo));
                 continue;
             }
             if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(9))) {
@@ -328,11 +323,13 @@ import java.util.Map;
                 continue;
             }
             if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(17))) {
-                if (cellCopyFrom.getCellType() != CellType.FORMULA) {
-                    matrice.setQuantitauser01(formatter.formatCellValue(cellCopyFrom));
-                } else {
-                    matrice.setQuantitauser01(formatter.formatCellValue(cellCopyFrom, evaluator));
+                if(appProperties.getFornitoriMapper().get(fornitore).containsKey("aumento_perc")
+                && StringUtils.isNotBlank(appProperties.getFornitoriMapper().get(fornitore).get("aumento_perc"))){
+                    String increase = this.addPercIncrease(cellCopyFrom, headerProps.get(17));
+                    matrice.setQuantitauser01(increase);
+                    continue;
                 }
+                matrice.setQuantitauser01(formatter.formatCellValue(cellCopyFrom));
                 continue;
             }
             if (columnFilteredMap.get(integer).equalsIgnoreCase(headerProps.get(18))) {
@@ -427,5 +424,20 @@ import java.util.Map;
             }
         }
         return this.columnFilteredMap;
+    }
+
+    private String addPercIncrease(Cell cell, String campo){
+        double prezzo = cell.getNumericCellValue();
+        log.debug("applicare l'aumento della percentuale per il campo " + campo);
+        double aumento = Integer.parseInt(appProperties.getFornitoriMapper().get(fornitore).get("aumento_perc"));
+        double tot = prezzo + (prezzo * aumento / 100);
+        log.debug("il nuovo prezzo è di: " + prezzo);
+        return this.formatCurrency(tot);
+    }
+
+    private String formatCurrency(double amount) {
+        DecimalFormat format = new DecimalFormat(ConstantString.CSV_CURRENCY_FORMAT);
+        format.setGroupingUsed(false);
+        return format.format(amount);
     }
 }

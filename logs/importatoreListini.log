@@ -1,0 +1,267 @@
+2022-03-14 12:19:26.500 ERROR 15308 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: ""
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:592) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:615) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:327) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:20:16.816 ERROR 8592 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: ""
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:592) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:615) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:327) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:20:37.427 ERROR 9928 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: ""
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:592) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:615) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:327) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:21:19.795 ERROR 4656 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: ""
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:592) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:615) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:327) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:22:10.754 ERROR 10048 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: ""
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:592) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:615) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:327) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:22:44.852 ERROR 17468 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: ""
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:592) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:615) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:327) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:25:04.260 ERROR 18976 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: ""
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:592) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:615) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:327) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:29:18.052 ERROR 18944 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: ""
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:592) ~[?:1.8.0_321]
+	at java.lang.Integer.parseInt(Integer.java:615) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:330) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:48:36.605 ERROR 3800 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: "1214,81"
+	at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:2043) ~[?:1.8.0_321]
+	at sun.misc.FloatingDecimal.parseDouble(FloatingDecimal.java:110) ~[?:1.8.0_321]
+	at java.lang.Double.parseDouble(Double.java:538) ~[?:1.8.0_321]
+	at java.lang.Double.valueOf(Double.java:502) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:326) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:56:30.044 ERROR 8640 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: "210,00"
+	at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:2043) ~[?:1.8.0_321]
+	at sun.misc.FloatingDecimal.parseDouble(FloatingDecimal.java:110) ~[?:1.8.0_321]
+	at java.lang.Double.parseDouble(Double.java:538) ~[?:1.8.0_321]
+	at java.lang.Double.valueOf(Double.java:502) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.model.Matrice.setQuantitauser01(Matrice.java:278) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:333) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 12:57:27.630 ERROR 14744 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.NumberFormatException: For input string: "210,00"
+	at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:2043) ~[?:1.8.0_321]
+	at sun.misc.FloatingDecimal.parseDouble(FloatingDecimal.java:110) ~[?:1.8.0_321]
+	at java.lang.Double.parseDouble(Double.java:538) ~[?:1.8.0_321]
+	at java.lang.Double.valueOf(Double.java:502) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.model.Matrice.setQuantitauser01(Matrice.java:278) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:333) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:163) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:58) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 15:12:17.367 ERROR 22888 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.IllegalArgumentException: Cannot format given Object as a Number
+	at java.text.DecimalFormat.format(DecimalFormat.java:507) ~[?:1.8.0_321]
+	at java.text.Format.format(Format.java:157) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.model.Matrice.formatCurrency(Matrice.java:127) ~[classes/:?]
+	at it.calolenoci.importaListini.model.Matrice.setQuantitauser01(Matrice.java:277) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:332) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:166) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:61) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+
+2022-03-14 15:12:57.106 ERROR 21464 --- [main] i.c.i.r.ExcelReader                      : Errore durante importazione dei file excel
+
+java.lang.IllegalArgumentException: Cannot format given Object as a Number
+	at java.text.DecimalFormat.format(DecimalFormat.java:507) ~[?:1.8.0_321]
+	at java.text.Format.format(Format.java:157) ~[?:1.8.0_321]
+	at it.calolenoci.importaListini.model.Matrice.formatCurrency(Matrice.java:127) ~[classes/:?]
+	at it.calolenoci.importaListini.model.Matrice.setQuantitauser01(Matrice.java:277) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.rowToCSV(ExcelWriter.java:332) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.convertToCSV(ExcelWriter.java:166) ~[classes/:?]
+	at it.calolenoci.importaListini.writer.ExcelWriter.write(ExcelWriter.java:61) ~[classes/:?]
+	at it.calolenoci.importaListini.reader.ExcelReader.read(ExcelReader.java:40) [classes/:?]
+	at it.calolenoci.importaListini.helper.ReaderHelper.read(ReaderHelper.java:27) [classes/:?]
+	at it.calolenoci.importaListini.BatchImportatoreListini.execute(BatchImportatoreListini.java:55) [classes/:?]
+	at it.calolenoci.importaListini.ImportaListiniApplication.run(ImportaListiniApplication.java:26) [classes/:?]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:769) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:753) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:309) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303) [spring-boot-2.6.3.jar:2.6.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292) [spring-boot-2.6.3.jar:2.6.3]
+	at it.calolenoci.importaListini.ImportaListiniApplication.main(ImportaListiniApplication.java:21) [classes/:?]
+

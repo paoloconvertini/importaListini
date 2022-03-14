@@ -4,7 +4,7 @@ logging:
   file:
     name: ./logs/importatoreListini.log
 properties:
-  csvQuoteSN: true
+  csvQuoteSN: false
   input_dir: "C:\\Workspace\\processore_listini\\listini\\input"
   output_dir: "C:\\Workspace\\processore_listini\\listini\\output"
   imported_dir: "C:\\Workspace\\processore_listini\\listini\\importati"
@@ -36,15 +36,14 @@ properties:
     - campouser3
     - campouser4
     - campouser5
-    - PrezzoListinoFornitore
   fornitorimapper:
     atlas:
-      codice: CodArticolo
-      articolo: CodEan
-      descrizione: Descraarticolo
-      prezzi: Prezzo
+      CodArticolo: CodArticolo
+      CodEan: CodEan
+      Descraarticolo: Descraarticolo
+      quantitauser01: quantitauser01
       scatola: unitamisura
-      aumento_perc: 50
+      aumento_perc: 100
     mirage:
       codice: codArticolo
       art: codEan
